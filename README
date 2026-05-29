@@ -41,7 +41,6 @@ Create a docker compose file
 Edit that file
 `nano docker-compose.yaml`
 ```
-
 services:
   portainer:
     container_name: portainer
