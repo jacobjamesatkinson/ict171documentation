@@ -346,4 +346,4 @@ We can now use NGINX through cloudflare to proxy Tabbycat and give us SSL!
 	1. Point that to your private IP address and port (8042 for tabbydebate)
 6. Navigate to SSL, select your certificate and press 'force SSL'
 7. Save and navigate to your FQDN!
-8. ![Example of NGINX](https://video.jacobat.me/i/612e46af5570bc3b81d87e22d99b5fe6)
+8. ![Example of NGINX]([https://video.jacobat.me/i/612e46af5570bc3b81d87e22d99b5fe6](https://video.jacobat.me/_content/derived/612e46af5570bc3b81d87e22d99b5fe6/thumbnail.webp?v=1780368802786))
