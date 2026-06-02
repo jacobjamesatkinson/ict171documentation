@@ -41,6 +41,7 @@ Create a docker compose file
 Edit that file
 `nano docker-compose.yaml`
 ```
+
 services:
   portainer:
     container_name: portainer
@@ -112,4 +113,63 @@ Tabbycat is now set up and working!
 # Setting up NGINX Proxy Manager
 ==Ensure you have access to change your DNS records==
 
-NGINX is what we'll use for our
+NGINX Proxy Manager is what we'll use for our reverse proxy. This is a very important step as it allows us to use Let'sEncrypt SSL and DNS.
+
+Repeat the steps for creating and setting up the Docker Compose file
+`mkdir nginx-proxy
+`cd nginx-proxy`
+`touch docker compose.yaml`
+`nano docker compose.yaml`
+Paste the following compose file:
+```
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:2.15.0'
+    restart: unless-stopped
+
+    ports:
+      # These ports are in format <host-port>:<container-port>
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+      # Add any other Stream port you want to expose
+      # - '21:21' # FTP
+
+    environment:
+      TZ: "Australia/Brisbane"
+
+      # Uncomment this if you want to change the location of
+      # the SQLite DB file within the container
+      # DB_SQLITE_FILE: "/data/database.sqlite"
+
+      # Uncomment this if IPv6 is not enabled on your host
+      # DISABLE_IPV6: 'true'
+
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+```
+`docker compose up -d`
+
+Navigate to `http://0.0.0.0:81` and follow the GUI flow to create an account
+
+Before we can expose a service, we need to get SSL certificates. The best way to do this is through Cloudflare. 
+
+1. Navigate to 'certificates' on Nginx Proxy
+2. Press 'add certificate > Let's Encrypt via DNS'
+3. Visit https://dash.cloudflare.com
+4. Go into account settings and create a DNS API token with 'all zones' permissions
+5. Copy the token provided and paste it into the add certificate dialogue
+6. Wait for the authorisation to complete. This can take up to 10 minutes
+
+We can now use NGINX through cloudflare to proxy Tabbycat and give us SSL!
+
+1. On the cloudflare dash, go to DNS
+2. Create a new DNS entry
+3. Type a subdomain. In my case `tabbydebate.jacobat.me`, and point it to the public IP of your instance. Enable 'proxy through cloudflare' as this gives basic DDOS protection and hides your IP
+4. Go back to your NGINX proxy manager instance dashboard, and press 'add proxy host'
+5. Type your FQDN, select http or https (some applications will only accept one)
+	1. Point that to your private IP address and port (8042 for tabbydebate)
+6. Navigate to SSL, select your certificate and press 'force SSL'
+7. Save and navigate to your FQDN!
+8. ![[Pasted image 20260602105117.png]]
